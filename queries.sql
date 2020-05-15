@@ -187,6 +187,29 @@ WHERE dept_name IN ('Sales', 'Development');
 
 --CHALLENGE
 --technical analysis 1
+--getting total number of current employees by title
+SELECT e.emp_no,
+	e.first_name,
+	e.last_name,
+	s.salary,
+	t.from_date,
+	t.title
+INTO cur_emp_title
+FROM employees as e
+	INNER JOIN salaries as s
+	ON (e.emp_no = s.emp_no)
+	INNER JOIN titles as t
+	ON (e.emp_no = t.emp_no)
+WHERE (t.to_date = '9999-01-01')
+ORDER BY e.emp_no ASC;
+
+SELECT COUNT(emp_no), title
+INTO num_title_total
+FROM cur_emp_title
+GROUP BY title
+ORDER BY title;
+
+--getting retirement employees with title
 SELECT e.emp_no,
 	e.first_name,
 	e.last_name,
@@ -205,14 +228,7 @@ FROM employees as e
 WHERE (e.birth_date BETWEEN '1952-01-01' AND '1955-12-31')
      AND (e.hire_date BETWEEN '1985-01-01' AND '1988-12-31')
      AND (de.to_date = '9999-01-01')
---GROUP BY t.title
 ORDER BY t.title ASC;
-
---counts by title
-SELECT COUNT(emp_no), title
-FROM emp_info_title
-GROUP BY title
-ORDER BY title;
 
 -- Partition the data to show only most recent title per employee
 SELECT emp_no,
@@ -232,3 +248,25 @@ FROM
  FROM emp_info_title
  ) tmp WHERE rn = 1
 ORDER BY emp_no;
+
+--get counts for retirement titles
+SELECT COUNT(emp_no), title
+INTO num_title_retire
+FROM cur_emp_info_title
+GROUP BY title
+ORDER BY title;
+
+--Mentor identification
+SELECT e.emp_no,
+	e.first_name,
+	e.last_name,
+	t.title,
+	t.from_date,
+	t.to_date
+INTO mentor_info
+FROM employees as e
+INNER JOIN titles as t
+ON (e.emp_no = t.emp_no)
+WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
+     AND (t.to_date = '9999-01-01');
+
